@@ -11,7 +11,7 @@ function FlashController() {
   const [serverStatus, setServerStatus] = useState("checking");
 
   // Backend server URL - store this in an environment variable in production
-  const API_URL = "https://your-backend-domain.com/api";
+  const API_URL = "https://drc-controller.onrender.com/api";
 
   // Check server health on component mount
   useEffect(() => {
