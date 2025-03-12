@@ -17,6 +17,63 @@ const ESP32_IP = process.env.ESP32_IP || '192.168.31.220';
 app.use(cors());
 app.use(express.json());
 
+// Root route (homepage)
+app.get('/', (req, res) => {
+  res.send(`
+    <html>
+      <head>
+        <title>ESP32 LED Control API</title>
+        <style>
+          body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+          }
+          h1 {
+            color: #333;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+          }
+          code {
+            background: #f4f4f4;
+            padding: 2px 5px;
+            border-radius: 3px;
+          }
+          .endpoint {
+            background: #f8f8f8;
+            border-left: 4px solid #4CAF50;
+            padding: 10px 15px;
+            margin: 15px 0;
+          }
+        </style>
+      </head>
+      <body>
+        <h1>ESP32 LED Control API</h1>
+        <p>This server acts as a proxy between your frontend application and your ESP32 device.</p>
+        
+        <h2>Available Endpoints:</h2>
+        
+        <div class="endpoint">
+          <h3>GET /api/health</h3>
+          <p>Check if the API server is running</p>
+          <p>Example: <code>${req.protocol}://${req.get('host')}/api/health</code></p>
+        </div>
+        
+        <div class="endpoint">
+          <h3>GET /api/led?state=1|0</h3>
+          <p>Control the LED state on the ESP32</p>
+          <p>Example: <code>${req.protocol}://${req.get('host')}/api/led?state=1</code> (to turn on)</p>
+        </div>
+        
+        <p>Server Status: Running</p>
+        <p>ESP32 configured at: ${ESP32_IP}</p>
+      </body>
+    </html>
+  `);
+});
+
 // Route to control the LED
 app.get('/api/led', async (req, res) => {
   const { state } = req.query;
