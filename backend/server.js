@@ -11,7 +11,8 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 // ESP32 URL from environment variable
-const ESP32_URL = process.env.ESP32_URL || 'http://drccontroller.ddns.net:8080';
+const ESP32_URL = process.env.ESP32_URL
+const ESP32_API_KEY = process.env.ESP32_API_KEY
 
 // Middleware
 app.use(cors());
@@ -89,9 +90,9 @@ app.get('/api/led', async (req, res) => {
   }
 
   try {
-    // Forward the request to the ESP32
-    const response = await axios.get(`${ESP32_URL}/led?state=${state}`, {
-      timeout: 10000 // 10 seconds timeout
+    // Include API key in request
+    const response = await axios.get(`${ESP32_URL}/led?state=${state}&key=${ESP32_API_KEY}`, {
+      timeout: 10000
     });
     
     // Return the ESP32's response to the client
@@ -114,8 +115,8 @@ app.get('/api/led', async (req, res) => {
 app.get('/api/status', async (req, res) => {
   try {
     // Forward the request to the ESP32
-    const response = await axios.get(`${ESP32_URL}/status`, {
-      timeout: 5000 // 5 seconds timeout
+    const response = await axios.get(`${ESP32_URL}/status?key=${ESP32_API_KEY}`, {
+      timeout: 5000
     });
     
     // Return the ESP32's response to the client
