@@ -10,8 +10,8 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// ESP32 IP address (stored in environment variable)
-const ESP32_IP = process.env.ESP32_IP || '192.168.31.220';
+// ESP32 URL from environment variable
+const ESP32_URL = process.env.ESP32_URL || 'http://drccontroller.ddns.net:8080';
 
 // Middleware
 app.use(cors());
@@ -67,8 +67,14 @@ app.get('/', (req, res) => {
           <p>Example: <code>${req.protocol}://${req.get('host')}/api/led?state=1</code> (to turn on)</p>
         </div>
         
+        <div class="endpoint">
+          <h3>GET /api/status</h3>
+          <p>Get the current status of the LED</p>
+          <p>Example: <code>${req.protocol}://${req.get('host')}/api/status</code></p>
+        </div>
+        
         <p>Server Status: Running</p>
-        <p>ESP32 configured at: ${ESP32_IP}</p>
+        <p>ESP32 configured at: ${ESP32_URL}</p>
       </body>
     </html>
   `);
@@ -84,8 +90,8 @@ app.get('/api/led', async (req, res) => {
 
   try {
     // Forward the request to the ESP32
-    const response = await axios.get(`http://${ESP32_IP}/led?state=${state}`, {
-      timeout: 5000 // 5 seconds timeout
+    const response = await axios.get(`${ESP32_URL}/led?state=${state}`, {
+      timeout: 10000 // 10 seconds timeout
     });
     
     // Return the ESP32's response to the client
@@ -104,6 +110,22 @@ app.get('/api/led', async (req, res) => {
   }
 });
 
+// Route to get the LED status
+app.get('/api/status', async (req, res) => {
+  try {
+    // Forward the request to the ESP32
+    const response = await axios.get(`${ESP32_URL}/status`, {
+      timeout: 5000 // 5 seconds timeout
+    });
+    
+    // Return the ESP32's response to the client
+    res.status(response.status).json(response.data);
+  } catch (error) {
+    console.error('Error getting ESP32 status:', error.message);
+    res.status(500).json({ error: 'Failed to get ESP32 status.' });
+  }
+});
+
 // Health check endpoint
 app.get('/api/health', (req, res) => {
   res.status(200).json({ status: 'ok' });
@@ -112,5 +134,5 @@ app.get('/api/health', (req, res) => {
 // Start the server
 app.listen(PORT, () => {
   console.log(`Backend server running on port ${PORT}`);
-  console.log(`ESP32 device configured at: ${ESP32_IP}`);
+  console.log(`ESP32 device configured at: ${ESP32_URL}`);
 });
